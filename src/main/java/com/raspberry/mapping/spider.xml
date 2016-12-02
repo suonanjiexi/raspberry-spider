@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cn.hys.dao.DeptManageMapper">
+    <resultMap type="com.cn.hys.model.DeptManageDetail" id="DeptResultMap">
+    	<id property="id" column="id" jdbcType="INTEGER"/> 
+    	<result property="deptName" column="channelName"/>
+    	<result property="createTime" column="createTime"/>
+    	<result property="createName" column="createName"/>
+    	<result property="updateTime" column="updateTime"/>
+    	<result property="updateName" column="updateName"/>
+    	<result property="sellPlatefrom" column="sellPlatefrom"/>
+    	<result property="orderLogo" column="orderLogo"/>
+    </resultMap>
+    <resultMap type="com.cn.hys.model.DeptManageDetail" id="IdResultMap">
+    	<id property="id" column="id" jdbcType="INTEGER"/> 
+    </resultMap>
+    <!-- 检索 -->
+    <select id="findDeptDeatil" resultMap="DeptResultMap" parameterType="com.cn.hys.vo.DeptManageVO">
+    	SELECT
+			id,
+			channelName,
+			createTime,
+			updateTime,
+			sellPlatefrom,
+			orderLogo
+		FROM
+		fc_channel
+		<where>
+			 <if test="deptName != null and deptName != ''">
+			 	 channelName = #{deptName,jdbcType=VARCHAR}
+			 </if>
+		</where>
+		  order by  updateTime desc
+		 LIMIT #{pageModel.offset},#{pageModel.numPerPage};
+    </select>
+       <!-- 各数 -->
+    <select id="findCount" resultType="int" parameterType="com.cn.hys.vo.DeptManageVO">
+    	SELECT
+		 count(id)
+		FROM(
+		SELECT
+			id,
+			channelName,
+			createTime,
+			updateTime,
+			sellPlatefrom,
+			orderLogo
+		FROM
+		fc_channel
+		<where>
+			 <if test="deptName != null and deptName != ''">
+			 	 channelName = #{deptName,jdbcType=VARCHAR}
+			 </if>
+		</where>
+		)AS a;
+    </select>
+       <!-- 按id查询  -->
+     <select id="getDeptDetailById" parameterType="java.lang.Integer" resultMap="DeptResultMap">
+    	SELECT
+			id,
+			channelName,
+			createTime,
+			updateTime,
+			sellPlatefrom,
+			orderLogo
+		FROM
+		 fc_channel
+		<where>
+			  id = #{id:INTEGER}
+		</where>
+     </select>
+     <!-- 按id修改 -->
+     <update id = "modifyDept" parameterType="com.cn.hys.model.DeptManageDetail">
+     	update 
+     		fc_channel
+     	set 
+     	 <!-- <if test="sellPlatefrom != null and sellPlatefrom != ''">
+     		sellPlatefrom = #{sellPlatefrom},
+     	 </if>
+     	 <if test="orderLogo != null and orderLogo != ''">
+     		orderLogo = #{orderLogo},
+     	 </if> -->
+     	     channelName = #{deptName}
+     	where
+     		id = #{id}
+     </update>
+     <!-- 添加 -->
+     <insert id = "addDeptDeatil" parameterType="com.cn.hys.vo.DeptManageVO">
+     	insert into
+     		fc_channel
+     		(    
+     		   <if test="id == null and id == ''">
+     	         #{id},
+     	       </if>   
+	     		channelName,
+	     		createTime
+     		)
+     	values(  
+     	     <if test="id == null and id == ''">
+     	         #{id},
+     	     </if>         
+			 	 #{deptName},
+			 	 #{createTime}
+     		  )
+     </insert>
+     <!-- 删除 -->
+     <delete id = "delDept" parameterType="java.lang.Integer">
+     	delete
+     		from 
+     			fc_channel
+     		<where>
+			  id = #{id:INTEGER}
+			</where>
+     </delete>
+     
+      <select id="findDeptName"  resultMap="DeptResultMap" parameterType="com.cn.hys.vo.DeptManageVO">
+    	SELECT
+			channelName
+		FROM
+		    fc_channel
+		<where>
+		   1=1
+		<if test=" deptName!= null and deptName != ''">
+			 and	 channelName = #{deptName,jdbcType=VARCHAR}
+		</if>
+		group by channelName
+			
+		</where>
+     </select>
+     <select id="idMax" resultMap="IdResultMap" parameterType="com.cn.hys.model.DeptManageDetail">
+       select 
+        MAX(id) AS  id
+         from
+         fc_channel
+       where 1=1
+     </select>
+</mapper>
